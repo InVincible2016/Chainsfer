@@ -35,10 +35,6 @@ class CancelReviewComponent extends Component {
     this.setState({ open: false })
   }
 
-  handleDestinationOnChange = (event) => {
-    this.setState({ destinationInput: event.target.value })
-  }
-
   renderModal = () => {
     let { classes, actionsPending } = this.props
 
@@ -65,6 +61,7 @@ class CancelReviewComponent extends Component {
                 <Button
                   color='primary'
                   onClick={this.handleModalClose}
+                  id='close'
                 >
                   Let me think again
                 </Button>
@@ -76,6 +73,7 @@ class CancelReviewComponent extends Component {
                     color='primary'
                     disabled={actionsPending.cancelTransfer}
                     onClick={this.handleReviewNext}
+                    id='confirmCancel'
                   >
                     Cancel Transfer
                   </Button>
@@ -138,7 +136,7 @@ class CancelReviewComponent extends Component {
                   <Typography className={classes.reviewSubtitle} align='left'>
                      From
                   </Typography>
-                  <Typography className={classes.reviewContent} align='left'>
+                  <Typography className={classes.reviewContent} align='left' id='sender'>
                     {sender}
                   </Typography>
                 </Grid>
@@ -146,7 +144,7 @@ class CancelReviewComponent extends Component {
                   <Typography className={classes.reviewSubtitle} align='left'>
                      To
                   </Typography>
-                  <Typography className={classes.reviewContent} align='left'>
+                  <Typography className={classes.reviewContent} align='left' id='destination'>
                     {destination}
                   </Typography>
                 </Grid>
@@ -154,7 +152,7 @@ class CancelReviewComponent extends Component {
                   <Typography className={classes.reviewSubtitle} align='left'>
                      Amount
                   </Typography>
-                  <Typography className={classes.reviewContent} align='left'>
+                  <Typography className={classes.reviewContent} align='left' id='transferAmount'>
                     {transferAmount} {getCryptoSymbol(cryptoType)}
                   </Typography>
                 </Grid>
@@ -162,17 +160,18 @@ class CancelReviewComponent extends Component {
                   <Typography className={classes.reviewSubtitle} align='left'>
                       Transaction Fee
                   </Typography>
-                  <Typography className={classes.reviewContent} align='left'>
-                    {!actionsPending.getTxCost && txCost
-                      ? `${txCost.costInStandardUnit} ${getCryptoSymbol(getTxFeesCryptoType(cryptoType))}`
-                      : <CircularProgress size={18} color='primary' />}
-                  </Typography>
+                  {!actionsPending.getTxCost && txCost
+                    ? <Typography className={classes.reviewContent} align='left'>
+                      {txCost.costInStandardUnit} {getCryptoSymbol(getTxFeesCryptoType(cryptoType))}
+                    </Typography>
+                    : <CircularProgress size={18} color='primary' />
+                  }
                 </Grid>
                 <Grid item className={classes.reviewItem}>
                   <Typography className={classes.reviewSubtitle} align='left'>
                      Sent on
                   </Typography>
-                  <Typography className={classes.reviewContent} align='left'>
+                  <Typography className={classes.reviewContent} align='left' id='sendTime'>
                     {sendTime}
                   </Typography>
                 </Grid>
@@ -188,6 +187,7 @@ class CancelReviewComponent extends Component {
                 color='primary'
                 size='large'
                 onClick={this.handleModalOpen}
+                id='cancel'
               >
                 Cancel Transfer
               </Button>
