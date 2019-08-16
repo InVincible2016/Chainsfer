@@ -47,24 +47,27 @@ class ReceiveWalletSelectionComponent extends Component {
     const { walletType, onWalletSelected, transfer } = this.props
     return (
       <Grid container direction='row' justify='center' alignItems='center'>
-        {walletSelections.map(w => (
-          <Grid item key={w.walletType}>
-            <SquareButton
-              disabled={
-                w.disabled ||
-                walletDisabledByCrypto(w.walletType, transfer.cryptoType) ||
-                this.lock()
-              }
-              onClick={() => onWalletSelected(w.walletType)}
-              logo={w.logo}
-              title={w.title}
-              desc={w.desc}
-              selected={w.walletType === walletType}
-              id={w.walletType}
-              disabledReason={w.disabledReason}
-            />
-          </Grid>
-        ))}
+        {walletSelections.map(w => {
+          if (w.walletType === 'coinbase') return null
+          return (
+            <Grid item key={w.walletType}>
+              <SquareButton
+                disabled={
+                  w.disabled ||
+                  walletDisabledByCrypto(w.walletType, transfer.cryptoType) ||
+                  this.lock()
+                }
+                onClick={() => onWalletSelected(w.walletType)}
+                logo={w.logo}
+                title={w.title}
+                desc={w.desc}
+                selected={w.walletType === walletType}
+                id={w.walletType}
+                disabledReason={w.disabledReason}
+              />
+            </Grid>
+          )
+        })}
       </Grid>
     )
   }

@@ -62,20 +62,23 @@ class WalletSelectionComponent extends Component<Props> {
     const { walletType, onWalletSelected } = this.props
     return (
       <Grid container direction='row' justify='center' alignItems='center'>
-        {walletSelections.map((w: Object) => (
-          <Grid item key={w.walletType}>
-            <SquareButton
-              id={w.walletType}
-              disabled={w.disabled || this.lock()}
-              onClick={() => onWalletSelected(w.walletType)}
-              logo={w.logo}
-              title={w.title}
-              desc={w.desc}
-              selected={w.walletType === walletType}
-              disabledReason={w.disabledReason}
-            />
-          </Grid>
-        ))}
+        {walletSelections.map((w: Object) => {
+          if (w.walletType === 'coinbase') return null
+          return (
+            <Grid item key={w.walletType}>
+              <SquareButton
+                id={w.walletType}
+                disabled={w.disabled || this.lock()}
+                onClick={() => onWalletSelected(w.walletType)}
+                logo={w.logo}
+                title={w.title}
+                desc={w.desc}
+                selected={w.walletType === walletType}
+                disabledReason={w.disabledReason}
+              />
+            </Grid>
+          )
+        })}
       </Grid>
     )
   }

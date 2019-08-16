@@ -2,6 +2,7 @@
 import MetamaskLogo from './images/metamask-button.png'
 import LedgerWalletLogo from './images/ledger-button.png'
 import DriveWalletLogo from './images/drive-wallet-button.png'
+import CoinbaseLogo from './images/coinbase.png'
 import { detect } from 'detect-browser'
 import env from './typedEnv'
 import { isMobile } from 'react-device-detect'
@@ -27,7 +28,13 @@ if (['test', 'staging'].includes(env.REACT_APP_ENV)) {
   // walletCryptoSupports['drive'].push({ cryptoType: 'libra', disabled: false })
 }
 
-function getWalletStatus () {
+function getWalletStatus (walletType) {
+  if (walletType === 'coinbase') {
+    return {
+      disabled: true,
+      disabledReason: 'Coming Soon'
+    }
+  }
   if (isMobile) {
     return {
       disabled: true,
@@ -63,18 +70,25 @@ export const walletSelections = [
     disabled: false
   },
   {
+    walletType: 'coinbase',
+    title: 'Coinbase',
+    desc: 'Coinbase Wallet',
+    logo: CoinbaseLogo,
+    ...getWalletStatus('coinbase')
+  },
+  {
     walletType: 'metamask',
     title: 'Metamask',
     desc: 'MetaMask Extension',
     logo: MetamaskLogo,
-    ...getWalletStatus()
+    ...getWalletStatus('metamask')
   },
   {
     walletType: 'ledger',
     title: 'Ledger',
     desc: 'Ledger Hardware Wallet',
     logo: LedgerWalletLogo,
-    ...getWalletStatus()
+    ...getWalletStatus('ledger')
   }
 ]
 
