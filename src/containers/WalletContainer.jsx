@@ -3,8 +3,8 @@ import { connect } from 'react-redux'
 import WalletComponent from '../components/WalletComponent'
 import { createLoadingSelector, createErrorSelector } from '../selectors'
 import { getTransferHistory } from '../actions/transferActions'
-import { push } from 'connected-react-router'
 import utils from '../utils'
+import { walletCryptoSupports } from '../wallet'
 
 class WalletContainer extends Component {
   componentDidMount () {
@@ -17,7 +17,7 @@ class WalletContainer extends Component {
   }
 
   render () {
-    let { cryptoPrice, transferHistory, currency, actionsPending, cloudWallet } = this.props
+    let { cryptoPrice, transferHistory, currency, actionsPending, cloudWalletAccounts } = this.props
 
     const toCurrencyAmount = (cryptoAmount, cryptoType) =>
       utils.toCurrencyAmount(cryptoAmount, cryptoPrice[cryptoType], currency)
@@ -32,7 +32,7 @@ class WalletContainer extends Component {
 
     return (
       <WalletComponent
-        cloudWallet={cloudWallet}
+        cloudWalletAccounts={cloudWalletAccounts}
         transferHistory={transferHistory}
         actionsPending={actionsPending}
         loadMoreTransferHistory={this.loadMoreTransferHistory}
@@ -61,12 +61,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    push: path => dispatch(push(path)),
     getTransferHistory: offset => dispatch(getTransferHistory(offset))
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(WalletContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(WalletContainer)

@@ -295,7 +295,7 @@ export default class EscrowWallet implements IWallet<AccountData> {
         value,
         addressesPool: accountData.hdWalletVariables.addresses
       })
-    } else if (['ethereum', 'dai'].includes(cryptoType)) {
+    } else if (['ethereum', 'dai'].includes(accountData.cryptoType)) {
       // send from escrow incurs no tx fees for eth
       return {
         price: '0',
