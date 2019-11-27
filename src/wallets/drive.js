@@ -28,7 +28,7 @@ export default class DriveWallet implements IWallet<AccountData> {
 
   account: IAccount
 
-  constructor (accountData?: AccountData) {
+  constructor(accountData?: AccountData) {
     if (accountData && accountData.cryptoType) {
       switch (accountData.cryptoType) {
         case 'dai':
@@ -157,7 +157,7 @@ export default class DriveWallet implements IWallet<AccountData> {
     return this.account
   }
 
-  async newAccount (name: string, cryptoType: string, options?: Object): Promise<IAccount> {
+  async newAccount(name: string, cryptoType: string, options?: Object): Promise<IAccount> {
     if (['dai', 'bitcoin', 'ethereum'].includes(cryptoType)) {
       if (cryptoType !== 'bitcoin') {
         return this._newEthereumAccount(name, cryptoType, options)
@@ -172,6 +172,7 @@ export default class DriveWallet implements IWallet<AccountData> {
   checkWalletConnection = async (additionalInfo: ?Object): Promise<boolean> => {
     let account = this.getAccount()
     let accountData = account.getAccountData()
+    console.log('accountData', accountData)
     if (accountData.privateKey === undefined || accountData.privateKey === null) {
       let walletFile = await getWallet()
       if (!walletFile) {
@@ -185,6 +186,7 @@ export default class DriveWallet implements IWallet<AccountData> {
       } else if (accountDataList[accountData.address]) {
         encryptedPrivateKey = accountDataList[accountData.address].encryptedPrivateKey
       }
+      console.log('accountDataList', accountDataList)
       if (!encryptedPrivateKey) throw new Error('Account does not exist')
 
       accountData.encryptedPrivateKey = encryptedPrivateKey

@@ -24,7 +24,7 @@ const initialState = {
   }
 }
 
-export default function (state = initialState, action) {
+export default function(state = initialState, action) {
   switch (action.type) {
     case 'UPDATE_TRANSFER_FORM':
       return {
@@ -41,3 +41,4 @@ export default function (state = initialState, action) {
       return state
   }
 }
+export default connect(mapStateToProps, mapDispatchToProps)(LoginContainer)

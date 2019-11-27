@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import TransferForm from '../components/TransferFormComponent'
+import EmailTransferForm from '../components/EmailTransferFormComponent'
+import DirectTransferForm from '../components/DirectTransferFormComponent'
 import {
   updateTransferForm,
   generateSecurityAnswer,
@@ -35,10 +36,10 @@ type State = {
 }
 const INSUFFICIENT_FUNDS_FOR_TX_FEES = 'Insufficient funds for paying transaction fees'
 
-class TransferFormContainer extends Component<Props, State> {
+class FormContainer extends Component<Props, State> {
   state = { openAddRecipientDialog: false }
 
-  componentDidMount () {
+  componentDidMount() {
     let {
       profile,
       transferForm,
@@ -77,7 +78,7 @@ class TransferFormContainer extends Component<Props, State> {
     })
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { transferForm, actionsPending, accountSelection } = this.props
     if (prevProps.transferForm.transferAmount !== this.props.transferForm.transferAmount) {
       // if transfer amount changed, update tx fee
@@ -189,7 +190,7 @@ class TransferFormContainer extends Component<Props, State> {
         }
       }
     } else if (name === 'sender' || name === 'destination') {
-      if (!validator.isEmail(value)) {
+      if (typeof value === 'string' && !validator.isEmail(value)) {
         return 'Invalid email'
       }
     } else if (name === 'password') {
@@ -297,7 +298,7 @@ class TransferFormContainer extends Component<Props, State> {
     this.props.updateTransferForm(_transferForm)
   }
 
-  render () {
+  render() {
     const {
       cryptoPrice,
       currency,
@@ -306,9 +307,39 @@ class TransferFormContainer extends Component<Props, State> {
       walletSelectionPrefilled,
       cryptoTypePrefilled,
       addressPrefilled,
-      accountSelection
+      accountSelection,
+      form,
+      transferForm,
+      cryptoAccounts
     } = this.props
     let balanceCurrencyAmount = '0'
+
+    if (form === 'direct_transfer') {
+      const _account = accountSelection
+        ? cryptoAccounts.find(_account => {
+            return (
+              _account.walletType === 'drive' && _account.cryptoType === accountSelection.cryptoType
+            )
+          })
+        : null
+      if (_account) {
+        balanceCurrencyAmount = utils.toCurrencyAmount(
+          _account.balanceInStandardUnit,
+          cryptoPrice[_account.cryptoType],
+          currency
+        )
+      }
+      return (
+        <DirectTransferForm
+          currency={currency}
+          handleTransferFormChange={this.handleTransferFormChange}
+          accountSelection={_account}
+          balanceCurrencyAmount={balanceCurrencyAmount}
+          transferForm={transferForm}
+        />
+      )
+    }
+
     if (accountSelection) {
       balanceCurrencyAmount = utils.toCurrencyAmount(
         accountSelection.balanceInStandardUnit,
@@ -316,10 +347,9 @@ class TransferFormContainer extends Component<Props, State> {
         currency
       )
     }
-
     return (
       <>
-        <TransferForm
+        <EmailTransferForm
           {...this.props}
           handleTransferFormChange={this.handleTransferFormChange}
           validate={this.validate}
@@ -368,6 +398,7 @@ const mapStateToProps = state => {
     accountSelection: state.accountReducer.cryptoAccounts.find(_account =>
       utils.accountsEqual(_account, state.formReducer.transferForm.accountId)
     ),
+    cryptoAccounts: state.accountReducer.cryptoAccounts,
     profile: state.userReducer.profile,
     txFee: state.transferReducer.txFee,
     cryptoPrice: state.cryptoPriceReducer.cryptoPrice,
@@ -382,4 +413,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TransferFormContainer)
+export default connect(mapStateToProps, mapDispatchToProps)(FormContainer)
