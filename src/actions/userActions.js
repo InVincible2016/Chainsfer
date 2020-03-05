@@ -7,6 +7,10 @@ import { enqueueSnackbar } from './notificationActions.js'
 import { getCryptoAccounts } from './accountActions'
 import { updateTransferForm } from '../actions/formActions'
 import update from 'immutability-helper'
+import { saveWallet, getWallet } from '../drive.js'
+import { createCloudWallet } from './walletActions'
+import { Base64 } from 'js-base64'
+import { REJECTED } from 'redux-promise-middleware'
 
 function clearError () {
   return { type: 'CLEAR_ERROR' }
@@ -30,10 +34,10 @@ function refreshAccessToken () {
   }
 }
 
-function onLogin (loginData: any) {
+function onGoogleLoginReturn (loginData: any) {
   return (dispatch: Function, getState: Function) => {
     dispatch({
-      type: 'LOGIN',
+      type: 'ON_GOOGLE_LOGIN_RETURN',
       payload: loginData
     })
     if (window.tokenRefreshTimer) clearInterval(window.tokenRefreshTimer)
@@ -235,10 +239,33 @@ function getUserRegisterTime () {
   }
 }
 
+function postLoginPreparation (loginData: any, progress?: Function) {
+  return (dispatch: Function, getState: Function) => {
+    const { idToken, profileObj } = loginData
+    dispatch(onGoogleLoginReturn(loginData))
+    return dispatch({
+      type: 'POST_LOGIN_PREPARATION',
+      payload: new Promise(async (resolve, reject) => {
+        // register/get user
+        const userMetaInfo = (await dispatch(register(idToken, profileObj))).value
+        const chainfrWalletFile = await getWallet()
+        if (!chainfrWalletFile) {
+          const { masterKey } = userMetaInfo
+          // if chainfr wallet file does not exist
+          // create
+          let accountDataList = await dispatch(createCloudWallet(masterKey))
+        }
+        await dispatch(getCryptoAccounts())
+        resolve()
+      })
+    })
+  }
+}
+
 export {
   clearError,
   register,
-  onLogin,
+  onGoogleLoginReturn,
   onLogout,
   setNewUserTag,
   refreshAccessToken,
@@ -248,5 +275,6 @@ export {
   editRecipient,
   setCoinbaseAccessObject,
   getUserCloudWalletFolderMeta,
-  getUserRegisterTime
+  getUserRegisterTime,
+  postLoginPreparation
 }
