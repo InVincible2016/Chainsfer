@@ -455,7 +455,6 @@ class LandingPageComponent extends Component {
                   src='https://www.youtube.com/embed/TeHbsQ0-wmM'
                   frameborder='0'
                   allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture'
-                  allowfullscreen
                 ></iframe>
               </Box>
             </Grid>
@@ -483,37 +482,6 @@ class LandingPageComponent extends Component {
                 </Box>
               </Box>
             </Grid>
-
-            {/* <Box mb={4}>
-          <Typography align='center' variant='h2'>
-            Start an Email Transfer from
-          </Typography>
-        </Box>
-        <Grid container direction='row' alignItems='center' justify='center'>
-          {walletSelections
-            .filter(w => {
-              return (
-                w.walletType !== 'drive' &&
-                !w.hide &&
-                w.walletType !== 'metamask' &&
-                w.walletType !== 'metamaskWalletConnect'
-              )
-            })
-            .map((w, i) => {
-              return (
-                <Grid item xs={4} sm={2} md={2} key={i}>
-                  <WalletButton walletType={w.walletType} handleClick={this.handleWalletSelect} />
-                </Grid>
-              )
-            })}
-        </Grid>
-        <Grid container direction='row' alignItems='center' justify='center'>
-          <Grid item>
-            <Button variant='contained' color='primary' onClick={() => push(path.transfer)}>
-              Start Transfer
-            </Button>
-          </Grid>
-        </Grid> */}
           </Grid>
         </Container>
       </Box>
