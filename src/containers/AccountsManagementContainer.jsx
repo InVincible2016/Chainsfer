@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import AddTokenDrawer from '../components/AddNewTokenComponent'
 import AccountsManagementComponent from '../components/AccountsManagementComponent'
 import { createLoadingSelector, createErrorSelector } from '../selectors'
 import {
   addCryptoAccounts,
   removeCryptoAccounts,
-  modifyCryptoAccountsName
+  modifyCryptoAccountsName,
+  getAllEthContracts
 } from '../actions/accountActions'
 import { accountStatus, CategorizedAccount } from '../types/account.flow.js'
 import { push } from 'connected-react-router'
@@ -14,6 +16,14 @@ import utils from '../utils'
 import { getCryptoPlatformType } from '../tokens'
 
 class AccountsManagementContainer extends Component {
+  state = {
+    addTokenDrawer: false
+  }
+
+  componentDidMount () {
+    this.props.getAllEthContracts()
+  }
+
   handleTransferFrom = (account: CategorizedAccount) => {
     const { push } = this.props
 
@@ -47,7 +57,8 @@ class AccountsManagementContainer extends Component {
         // Add account to categorizedAccounts by categorizedAccount id
         existIndex = categorizedAccounts.findIndex(
           account =>
-            account.address === accountData.address && account.walletType === accountData.walletType
+            account.address === accountData.address &&
+            account.walletType === accountData.walletType
         )
       }
       if (existIndex >= 0) {
@@ -85,20 +96,46 @@ class AccountsManagementContainer extends Component {
     this.props.removeCryptoAccounts(account.assets)
   }
 
+  toggleAddTokenDrawer = () => {
+    this.setState(state => {
+      return {
+        addTokenDrawer: !state.addTokenDrawer
+      }
+    })
+  }
+
   render () {
-    const { addCryptoAccounts, actionsPending, cryptoAccounts, currency, online } = this.props
+    const { addTokenDrawer } = this.state
+    const {
+      addCryptoAccounts,
+      actionsPending,
+      cryptoAccounts,
+      currency,
+      online,
+      ethContracts
+    } = this.props
     const categorizedAccounts = this.getCategorizedAccounts(cryptoAccounts)
     return (
-      <AccountsManagementComponent
-        categorizedAccounts={categorizedAccounts}
-        addCryptoAccounts={addCryptoAccounts}
-        actionsPending={actionsPending}
-        modifyCryptoAccountsName={this.modifyCryptoAccountsName}
-        removeCryptoAccounts={this.removeCryptoAccounts}
-        handleTransferFrom={this.handleTransferFrom}
-        online={online}
-        currency={currency}
-      />
+      <>
+        <AccountsManagementComponent
+          categorizedAccounts={categorizedAccounts}
+          addCryptoAccounts={addCryptoAccounts}
+          actionsPending={actionsPending}
+          modifyCryptoAccountsName={this.modifyCryptoAccountsName}
+          removeCryptoAccounts={this.removeCryptoAccounts}
+          handleTransferFrom={this.handleTransferFrom}
+          onAddToken={this.toggleAddTokenDrawer}
+          online={online}
+          currency={currency}
+        />
+        {addTokenDrawer && (
+          <AddTokenDrawer
+            wallets={categorizedAccounts}
+            onClose={this.toggleAddTokenDrawer}
+            ethContracts={ethContracts}
+          />
+        )}
+      </>
     )
   }
 }
@@ -119,6 +156,7 @@ const mapStateToProps = state => {
       removeCryptoAccounts: removeCryptoAccountsSelector(state),
       getCryptoAccounts: getCryptoAccountsSelector(state)
     },
+    ethContracts: state.accountReducer.ethContracts,
     cryptoPrice: state.cryptoPriceReducer.cryptoPrice,
     currency: state.cryptoPriceReducer.currency,
     error: errorSelector(state)
@@ -127,6 +165,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    getAllEthContracts: () => dispatch(getAllEthContracts()),
     addCryptoAccounts: accountData => dispatch(addCryptoAccounts(accountData)),
     removeCryptoAccounts: accountData => dispatch(removeCryptoAccounts(accountData)),
     modifyCryptoAccountsName: (accountData, newName) =>
@@ -135,4 +174,7 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountsManagementContainer)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AccountsManagementContainer)

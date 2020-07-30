@@ -328,6 +328,24 @@ function postTxAccountCleanUp (accountData: AccountData) {
   }
 }
 
+function getAllEthContracts () {
+  return {
+    type: 'GET_ALL_ETH_CONTRACTS',
+    payload: async () => {
+      return API.getAllEthContracts()
+    }
+  }
+}
+
+function getEthContract (address: string) {
+  return {
+    type: 'GET_ETH_CONTRACT',
+    payload: async () => {
+      return API.getEthContract(address)
+    }
+  }
+}
+
 export {
   syncWithNetwork,
   getTxFee,
@@ -340,5 +358,7 @@ export {
   modifyCryptoAccountsName,
   removeCryptoAccounts,
   clearAccountPrivateKey,
-  postTxAccountCleanUp
+  postTxAccountCleanUp,
+  getAllEthContracts,
+  getEthContract
 }

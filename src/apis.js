@@ -575,6 +575,29 @@ async function clearTransfer (request: { transferId: string }) {
   }
 }
 
+async function getAllEthContracts () {
+  try {
+    const rv = await chainsferApi.post('/ethContracts', {
+      action: 'GET_ALL_CONTRACTS'
+    })
+    return rv.data
+  } catch (err) {
+    throw new Error('Clear transfer failed.')
+  }
+}
+
+async function getEthContract (address: string) {
+  try {
+    const rv = await chainsferApi.post('/ethContracts', {
+      action: 'GET_CONTRACT',
+      address: address
+    })
+    return rv.data
+  } catch (err) {
+    throw new Error('Clear transfer failed.')
+  }
+}
+
 export default {
   directTransfer,
   transfer,
@@ -605,5 +628,7 @@ export default {
   getUserRegisterTime,
   lookupTxHash,
   getEmailTransfers,
-  clearTransfer
+  clearTransfer,
+  getAllEthContracts,
+  getEthContract
 }
