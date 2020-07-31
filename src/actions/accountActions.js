@@ -346,6 +346,16 @@ function getEthContract (address: string) {
   }
 }
 
+function newCryptoAccountFromToken (walletType, cryptoType, name, platformType, address) {
+  const newAccount = createAccount({
+    walletType,
+    name,
+    cryptoType,
+    platformType,
+    address
+  })
+}
+
 export {
   syncWithNetwork,
   getTxFee,

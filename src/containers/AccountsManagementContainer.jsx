@@ -10,6 +10,7 @@ import {
   getAllEthContracts
 } from '../actions/accountActions'
 import { accountStatus, CategorizedAccount } from '../types/account.flow.js'
+import { createAccount } from '../accounts/AccountFactory'
 import { push } from 'connected-react-router'
 import path from '../Paths.js'
 import utils from '../utils'
@@ -88,6 +89,26 @@ class AccountsManagementContainer extends Component {
     return categorizedAccounts
   }
 
+  getWallets = cryptoAccounts => {
+    let wallets = []
+    cryptoAccounts.forEach(accountData => {
+      const index = wallets.findIndex(wallet => {
+        return (
+          wallet.walletType === accountData.walletType && wallet.address === accountData.address
+        )
+      })
+      if (index < 0) {
+        wallets.push({
+          walletType: accountData.walletType,
+          address: accountData.address,
+          platformType: accountData.platformType,
+          name: accountData.name
+        })
+      }
+    })
+    return wallets
+  }
+
   modifyCryptoAccountsName = (account, newName) => {
     this.props.modifyCryptoAccountsName(account.assets, newName)
   }
@@ -104,6 +125,17 @@ class AccountsManagementContainer extends Component {
     })
   }
 
+  addToken = (wallet, token) => {
+    const newAccount = createAccount({
+      walletType: wallet.walletType,
+      name: wallet.name,
+      cryptoType: token.name,
+      platformType: 'ethereum',
+      address: wallet.address
+    })
+    addCryptoAccounts([newAccount.getAccountData()])
+  }
+
   render () {
     const { addTokenDrawer } = this.state
     const {
@@ -114,7 +146,14 @@ class AccountsManagementContainer extends Component {
       online,
       ethContracts
     } = this.props
-    const categorizedAccounts = this.getCategorizedAccounts(cryptoAccounts)
+    const categorizedAccounts = this.getCategorizedAccounts(
+      cryptoAccounts.filter(accountData => accountData.walletType !== 'drive')
+    )
+
+    const wallets = this.getWallets(
+      cryptoAccounts.filter(accountData => accountData.cryptoType !== 'bitcoin')
+    )
+
     return (
       <>
         <AccountsManagementComponent
@@ -130,9 +169,10 @@ class AccountsManagementContainer extends Component {
         />
         {addTokenDrawer && (
           <AddTokenDrawer
-            wallets={categorizedAccounts}
+            wallets={wallets}
             onClose={this.toggleAddTokenDrawer}
             ethContracts={ethContracts}
+            addToken={this.addToken}
           />
         )}
       </>
@@ -148,9 +188,7 @@ const errorSelector = createErrorSelector(['ADD_CRYPTO_ACCOUNTS', 'REMOVE_CRYPTO
 
 const mapStateToProps = state => {
   return {
-    cryptoAccounts: state.accountReducer.cryptoAccounts.filter(item => {
-      return item.walletType !== 'drive'
-    }),
+    cryptoAccounts: state.accountReducer.cryptoAccounts,
     actionsPending: {
       addCryptoAccounts: addCryptoAccountsSelector(state),
       removeCryptoAccounts: removeCryptoAccountsSelector(state),
